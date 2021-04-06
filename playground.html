@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>amogus XD</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script type="module">
+			import * as THREE from './node_modules/three/build/three.module.js';
+			import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+			import { OrbitControls} from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+
+			/*var audio = new Audio();
+			audio.src = "./music/feeling.mp3";
+			audio.play(); */
+
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x22BBDD );
+
+			var light = new THREE.AmbientLight(0x777777);
+			scene.add(light);
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const spotLight = new THREE.SpotLight( 0xffffff );
+			spotLight.position.set( 4, 4, 2 );
+			spotLight.castShadow = false;
+			spotLight.shadow.mapSize.width = 1024;
+			spotLight.shadow.mapSize.height = 1024;
+			spotLight.shadow.camera.near = 500;
+			spotLight.shadow.camera.far = 4000;
+			spotLight.shadow.camera.fov = 30;
+			spotLight.power = 10;
+			spotLight.distance = 20;
+			spotLight.decay = 0;
+			scene.add( spotLight );
+			const controls = new OrbitControls( camera, renderer.domElement ); 
+
+
+			// loading glTF resource: simplified with path and x-coordination as parameters
+			const loader = new GLTFLoader();
+			var object = 0;
+
+			function loadData(path, x, y, z, test) {
+			// Load a glTF resource
+			loader.load(
+			// resource URL
+			path,
+			// called when the resource is loaded
+			function ( gltf ) {
+          
+                if(test == true) {
+                    object = gltf.scene;
+                    object.position.set(x,y,z);
+                    object.rotation.z = 0;
+                    object.position.set(0,0,0);
+            object.rotation.set(0,2,0);
+			    	scene.add( object );
+			    }
+			    else if(test == false) {
+			    gltf.scene.children.forEach(child => child.position.x = x);
+      		    gltf.scene.children.forEach(child => child.position.y = y);
+      		    gltf.scene.children.forEach(child => child.position.z = z);
+      		    gltf.scene.children.forEach(child => child.rotation.z = 0);
+      		    scene.add(gltf.scene);
+			    }
+
+
+				gltf.animations; // Array<THREE.AnimationClip>
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array<THREE.Group>
+				gltf.cameras; // Array<THREE.Camera>
+				gltf.asset; // Object
+
+               
+			},
+
+			// called while loading is progressing
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	        // called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+	 	  );
+			return object;
+		}   
+            
+		    // initialize amogus
+            var character = loadData("./obj/amogus/amogusRed.gltf", 0, 0, 0, true);
+
+		    // initialize ground
+            for(var x = 0; x < 10; x++) {
+            	for(var y = 0; y < 10; y++) {
+            	    loadData("./obj/minecraft/scene.gltf", -y*2, -2, -x*2, false);
+                }
+            }
+
+
+            // static camera for the environment
+            camera.position.z = 2;
+            camera.position.x = 9;
+            camera.position.y = 4;
+            camera.rotation.y +=1;
+
+            controls.update();
+            var movingVelocity = 0;
+            var rotationVelocity = 0;
+
+            function moveCharacter() {
+            	document.addEventListener('keydown', 
+            	function(event) {
+            	movingVelocity = 0;
+            	rotationVelocity = 0;
+    			if(event.keyCode == 87) {      // hinten gehen
+    		    movingVelocity = 0.10;
+   			    }
+   				else if(event.keyCode == 83) { // vorne gehen
+   				movingVelocity = -0.10;
+                } 
+                else if(event.keyCode == 65) { // links drehen
+                rotationVelocity = 0.05;
+                }
+                else if(event.keyCode == 68) { // links drehen
+                rotationVelocity = -0.05;
+                }
+             });
+
+            }
+
+			function animate( gltf ) {
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+                moveCharacter();
+                object.position.x += movingVelocity * Math.sin(object.rotation.y);
+                object.position.z += movingVelocity * Math.cos(object.rotation.y);
+                object.rotation.y += rotationVelocity;
+			}
+			animate();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>amogus XD</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script type="module">
+			import * as THREE from './node_modules/three/build/three.module.js';
+			import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+			import { OrbitControls} from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+
+			var audio = new Audio();
+			audio.src = "./music/feeling.mp3";
+			audio.play();
+
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x22BBDD );
+
+			var light = new THREE.AmbientLight(0x777777);
+			scene.add(light);
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const spotLight = new THREE.SpotLight( 0xffffff );
+			spotLight.position.set( 4, 4, 2 );
+			spotLight.castShadow = false;
+			spotLight.shadow.mapSize.width = 1024;
+			spotLight.shadow.mapSize.height = 1024;
+			spotLight.shadow.camera.near = 500;
+			spotLight.shadow.camera.far = 4000;
+			spotLight.shadow.camera.fov = 30;
+			spotLight.power = 10;
+			spotLight.distance = 20;
+			spotLight.decay = 0;
+			scene.add( spotLight );
+			const controls = new OrbitControls( camera, renderer.domElement ); 
+
+
+			// loading glTF resource: simplified with path and x-coordination as parameters
+			const loader = new GLTFLoader();
+
+			function loadData(path, x, y) {
+
+			// Load a glTF resource
+			loader.load(
+			// resource URL
+			path,
+			// called when the resource is loaded
+			function ( gltf ) {
+
+      		    gltf.scene.children.forEach(child => child.position.x = x);
+      		    gltf.scene.children.forEach(child => child.position.y = y);
+				scene.add( gltf.scene );
+				gltf.animations; // Array<THREE.AnimationClip>
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array<THREE.Group>
+				gltf.cameras; // Array<THREE.Camera>
+				gltf.asset; // Object
+
+			},
+
+			// called while loading is progressing
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+	 	  );
+		}   
+             // initialize amogus
+            loadData("./obj/amogus/amogusCyan.gltf", -2, 0);
+            loadData("./obj/amogus/amogusYellow.gltf", 0, 0);
+            loadData("./obj/amogus/amogusRed.gltf", 2, 0);
+            loadData("./obj/amogus/amogusPink.gltf", 4, 0);
+            loadData("./obj/amogus/amogusOrange.gltf", -4, 0);
+            loadData("./obj/amogus/amogusPurple.gltf", -2, 2);
+            loadData("./obj/amogus/amogusBlack.gltf", 0, 2);
+            loadData("./obj/amogus/amogusDarkGreen.gltf", 2,2);
+            loadData("./obj/amogus/amogusGreen.gltf", 4,2);
+            loadData("./obj/amogus/amogusWhite.gltf", -4,2);
+
+            camera.position.z = 0;
+            camera.position.x = 0;
+            camera.position.y = 10;
+
+            controls.update();
+
+			function animate() {
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+
+		    	const velocity = 0.001;
+		    	scene.children.forEach(child => child.rotation.x += Math.random()*0.05);
+		    	scene.children.forEach(child => child.rotation.y += Math.random()*0.05);
+		    	scene.children.forEach(child => child.rotation.z += Math.random()*0.05);
+
+
+			}
+			animate();
+		</script>
+	</body>
+</html>
